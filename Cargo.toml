@@ -1,0 +1,16 @@
+[package]
+name = "gslc"
+version = "1.0.0"
+edition = "2021"
+authors = ["Geometry Shorthand Language Team"]
+description = "Geometry Shorthand Language Compiler - Translate geometric shorthand to English"
+license = "MIT"
+repository = "https://github.com/politikl/gslc"
+keywords = ["geometry", "compiler", "mathematics", "education"]
+categories = ["command-line-utilities", "parser-implementations"]
+
+[[bin]]
+name = "gslc"
+path = "src/main.rs"
+
+[dependencies]
