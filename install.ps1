@@ -6,6 +6,7 @@ Write-Host ""
 
 $ErrorActionPreference = "Stop"
 
+# Get latest release
 Write-Host "📦 Fetching latest release..." -ForegroundColor Yellow
 try {
     $response = Invoke-RestMethod -Uri "https://api.github.com/repos/politikl/gslc/releases/latest"
@@ -17,12 +18,14 @@ catch {
     exit 1
 }
 
+# Download URL
 $filename = "gslc-windows-x86_64.zip"
 $downloadUrl = "https://github.com/politikl/gslc/releases/download/$version/$filename"
 
 Write-Host "⬇️  Downloading GSLC..." -ForegroundColor Yellow
 Write-Host "   URL: $downloadUrl"
 
+# Create temp directory
 $tempDir = New-Item -ItemType Directory -Path (Join-Path $env:TEMP ([System.IO.Path]::GetRandomFileName()))
 $downloadPath = Join-Path $tempDir $filename
 
@@ -35,20 +38,24 @@ catch {
     exit 1
 }
 
+# Extract
 Write-Host "📂 Extracting..." -ForegroundColor Yellow
 Expand-Archive -Path $downloadPath -DestinationPath $tempDir -Force
 
+# Install directory
 $installDir = "$env:USERPROFILE\.local\bin"
 if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 }
 
+# Copy binary
 Write-Host "💾 Installing..." -ForegroundColor Yellow
 $binaryPath = Join-Path $tempDir "gslc.exe"
 $installPath = Join-Path $installDir "gslc.exe"
 
 Copy-Item -Path $binaryPath -Destination $installPath -Force
 
+# Cleanup
 Remove-Item -Recurse -Force $tempDir
 
 Write-Host ""
@@ -57,6 +64,7 @@ Write-Host ""
 Write-Host "📍 Installed to: $installPath"
 Write-Host ""
 
+# Check if in PATH
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -like "*$installDir*") {
     Write-Host "✓ $installDir is in your PATH" -ForegroundColor Green
@@ -70,6 +78,6 @@ else {
 
 Write-Host ""
 Write-Host "🎉 Try it out:" -ForegroundColor Cyan
-Write-Host '   gslc "\\P:A/P:B/S:AB\\"'
+Write-Host "   gslc '\\P:A/P:B/S:AB\\'"
 Write-Host ""
 Write-Host "📚 Documentation: https://tinyurl.com/geoshorthand" -ForegroundColor Cyan
