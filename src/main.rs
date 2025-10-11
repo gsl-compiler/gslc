@@ -634,9 +634,9 @@ fn show_about() {
     println!("║           GSL Compiler (gslc) - About                         ║");
     println!("╚═══════════════════════════════════════════════════════════════╝\n");
     println!("Geometry Shorthand Language (GSL) Compiler");
-    println!("Version: 1.0.0\n");
+    println!("Version: 2.0.0\n");
     println!("Created by: Aarav Desai (politikl on GitHub)");
-    println!("Language by: Lihan Xiao and Yiheng Ying\n");
+    println!("Language by: LX and YY (initial were used to conceal the authors' real names)\n");
     println!("Description:");
     println!("  GSL is a highly logical and rigorous shorthand language for");
     println!("  expressing geometric constructions and proofs. This compiler");
@@ -644,7 +644,7 @@ fn show_about() {
     println!("Quote:");
     println!("  \"Geometry Shorthand (Construction) is a highly logical and");
     println!("   rigorous language. A mistake in conventions will not be");
-    println!("   tolerated.\" - Lihan Xiao\n");
+    println!("   tolerated.\" - LX\n");
     println!("Repository: https://github.com/politikl/gslc");
     println!("Language Docs: https://tinyurl.com/geoshorthand\n");
     println!("For help, use: gslc help");
