@@ -3,6 +3,7 @@ use std::env;
 use std::fs;
 use std::io::{self, Write, BufRead};
 use std::time::Instant;
+use std::process::Command;
 
 struct Translator {
     properties: HashMap<&'static str, &'static str>,
@@ -152,8 +153,8 @@ impl Translator {
             if stmt.contains(':') {
                 let prefix = stmt.split(':').next().unwrap_or("");
                 let valid_prefixes = ["P", "S", "L", "W", "C", "J", "R", "G", "PB", "CCO", "CC", "AB", "ICO", "IC", "EAB", "ECO", "EC", "M", "MD", "CT", "PD", "OC", "PL"];
-                if !valid_prefixes.contains(&prefix) && !prefix.starts_with('\\') {
-                    errors.push(format!("Statement {}: Unknown construction prefix '{}'", i + 1, prefix));
+                if !valid_prefixes.contains(&prefix) && !prefix.starts_with('\\') && !prefix.is_empty() {
+                    errors.push(format!("Line {}: Unknown construction prefix '{}'", i + 1, prefix));
                 }
             }
         }
@@ -702,7 +703,7 @@ impl Translator {
     fn format_output(&self, translations: &[String], format: &str) -> String {
         match format {
             "latex" => self.format_latex(translations),
-            "markdown" => self.format_markdown(translations),
+            "markdown" | "md" => self.format_markdown(translations),
             "json" => self.format_json(translations),
             "html" => self.format_html(translations),
             _ => translations
@@ -736,18 +737,105 @@ impl Translator {
         let items: Vec<String> = translations
             .iter()
             .enumerate()
-            .map(|(i, t)| format!("  {{\n    \"step\": {},\n    \"description\": \"{}\"\n  }}", i + 1, t.replace("\"", "\\\"")))
+            .map(|(i, t)| {
+                let escaped = t.replace('\\', "\\\\").replace('"', "\\\"");
+                format!("  {{\n    \"step\": {},\n    \"description\": \"{}\"\n  }}", i + 1, escaped)
+            })
             .collect();
         format!("{{\n  \"steps\": [\n{}\n  ]\n}}", items.join(",\n"))
     }
 
     fn format_html(&self, translations: &[String]) -> String {
-        let mut output = String::from("<!DOCTYPE html>\n<html>\n<head>\n  <title>GSL Translation</title>\n  <style>\n    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; }\n    ol { line-height: 1.8; }\n    li { margin-bottom: 10px; }\n  </style>\n</head>\n<body>\n  <h1>Geometry Construction Steps</h1>\n  <ol>\n");
+        let mut output = String::from("<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>GSL Translation</title>\n  <style>\n    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }\n    ol { line-height: 1.8; }\n    li { margin-bottom: 10px; }\n  </style>\n</head>\n<body>\n  <h1>Geometry Construction Steps</h1>\n  <ol>\n");
         for trans in translations {
-            output.push_str(&format!("    <li>{}</li>\n", trans));
+            let escaped = trans.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
+            output.push_str(&format!("    <li>{}</li>\n", escaped));
         }
         output.push_str("  </ol>\n</body>\n</html>");
         output
+    }
+
+    fn generate_svg(&self, input: &str, width: u32, height: u32) -> String {
+        let mut svg = format!(
+            "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\">\n",
+            width, height
+        );
+        svg.push_str("  <rect width=\"100%\" height=\"100%\" fill=\"#f5f5f5\"/>\n");
+        svg.push_str("  <style>\n");
+        svg.push_str("    .point { fill: #000; }\n");
+        svg.push_str("    .line { stroke: #000; stroke-width: 2; }\n");
+        svg.push_str("    .label { font-family: Arial; font-size: 14px; fill: #000; }\n");
+        svg.push_str("  </style>\n");
+
+        let statements: Vec<&str> = input.split('/').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
+        let mut points: HashMap<String, (f64, f64)> = HashMap::new();
+        let mut point_index = 0;
+
+        // Simple layout: arrange points in a circle
+        let cx = width as f64 / 2.0;
+        let cy = height as f64 / 2.0;
+        let radius = (width.min(height) as f64 / 2.0) * 0.7;
+
+        for stmt in statements {
+            let stmt = stmt.trim_start_matches("\\\\").trim_end_matches("\\\\");
+            
+            // Extract point names
+            if stmt.starts_with("P:") {
+                let rest = &stmt[2..];
+                let point_names: Vec<&str> = rest.split(',').collect();
+                for name in point_names {
+                    let name = name.trim();
+                    if !points.contains_key(name) {
+                        let angle = (point_index as f64) * 2.0 * std::f64::consts::PI / 6.0;
+                        let x = cx + radius * angle.cos();
+                        let y = cy + radius * angle.sin();
+                        points.insert(name.to_string(), (x, y));
+                        point_index += 1;
+                    }
+                }
+            }
+            
+            // Draw segments
+            if stmt.starts_with("S:") {
+                let rest = &stmt[2..];
+                if rest.len() >= 2 {
+                    let p1 = &rest[0..1];
+                    let p2 = &rest[1..2];
+                    if let (Some(&(x1, y1)), Some(&(x2, y2))) = (points.get(p1), points.get(p2)) {
+                        svg.push_str(&format!(
+                            "  <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" class=\"line\"/>\n",
+                            x1, y1, x2, y2
+                        ));
+                    }
+                }
+            }
+            
+            // Draw polygons
+            if stmt.starts_with("J:") {
+                let rest = &stmt[2..];
+                let mut path = String::from("  <path d=\"M");
+                for (i, ch) in rest.chars().enumerate() {
+                    if let Some(&(x, y)) = points.get(&ch.to_string()) {
+                        if i == 0 {
+                            path.push_str(&format!(" {} {}", x, y));
+                        } else {
+                            path.push_str(&format!(" L {} {}", x, y));
+                        }
+                    }
+                }
+                path.push_str(" Z\" class=\"line\" fill=\"none\"/>\n");
+                svg.push_str(&path);
+            }
+        }
+
+        // Draw points last (so they appear on top)
+        for (name, &(x, y)) in &points {
+            svg.push_str(&format!("  <circle cx=\"{}\" cy=\"{}\" r=\"4\" class=\"point\"/>\n", x, y));
+            svg.push_str(&format!("  <text x=\"{}\" y=\"{}\" class=\"label\">{}</text>\n", x + 10.0, y - 10.0, name));
+        }
+
+        svg.push_str("</svg>");
+        svg
     }
 }
 
@@ -792,7 +880,7 @@ fn show_about() {
     println!("║           GSL Compiler (gslc) - About                         ║");
     println!("╚═══════════════════════════════════════════════════════════════╝\n");
     println!("Geometry Shorthand Language (GSL) Compiler");
-    println!("Version: 2.0.0\n");
+    println!("Version: 3.0.1\n");
     println!("Created by: Aarav Desai (politikl on GitHub)");
     println!("Language by: LX and YY\n");
     println!("Description:");
@@ -817,6 +905,7 @@ fn show_help() {
     println!("  gslc <shorthand>              Translate shorthand directly");
     println!("  gslc -f <file.gsl>            Translate from file");
     println!("  gslc <shorthand> -o <file>    Save translation to file");
+    println!("  gslc <shorthand> --copy       Copy output to clipboard");
     println!("  gslc about                    Show about information");
     println!("  gslc help                     Show this help message");
     println!("  gslc lang                     Open language documentation");
@@ -827,6 +916,8 @@ fn show_help() {
     println!("  gslc interactive              Start interactive mode");
     println!("  gslc validate <shorthand>     Validate syntax");
     println!("  gslc stats <shorthand>        Show construction statistics");
+    println!("  gslc visualize <shorthand>    Generate SVG visualization");
+    println!("  gslc clip                     Translate from clipboard");
     println!("  gslc benchmark                Run performance benchmark\n");
     println!("OUTPUT FORMATS:");
     println!("  --format latex                LaTeX enumerate format");
@@ -845,7 +936,8 @@ fn show_help() {
     println!("  gslc \"\\\\P:A,B/S:AB\\\\\"");
     println!("  gslc -f problem.gsl --format latex");
     println!("  gslc validate \"\\\\P:A/S:AB\\\\\"");
-    println!("  gslc stats \"\\\\J:ABC/R:3;AB=ABC\\\\\"\n");
+    println!("  gslc visualize \"\\\\P:A,B,C/J:ABC\\\\\" -o triangle.svg");
+    println!("  gslc \"\\\\P:A,B/S:AB\\\\\" --copy\n");
     println!("For complete reference: gslc lang\n");
 }
 
@@ -1076,6 +1168,102 @@ fn interactive_mode(translator: &Translator) {
     }
 }
 
+fn copy_to_clipboard(text: &str) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let mut child = Command::new("pbcopy")
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to spawn pbcopy: {}", e))?;
+        
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(text.as_bytes())
+                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
+        }
+        
+        child.wait().map_err(|e| format!("Failed to wait for pbcopy: {}", e))?;
+        Ok(())
+    }
+    
+    #[cfg(target_os = "linux")]
+    {
+        let mut child = Command::new("xclip")
+            .args(&["-selection", "clipboard"])
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to spawn xclip (try: sudo apt install xclip): {}", e))?;
+        
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(text.as_bytes())
+                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
+        }
+        
+        child.wait().map_err(|e| format!("Failed to wait for xclip: {}", e))?;
+        Ok(())
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        let mut child = Command::new("clip")
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("Failed to spawn clip: {}", e))?;
+        
+        if let Some(mut stdin) = child.stdin.take() {
+            stdin.write_all(text.as_bytes())
+                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
+        }
+        
+        child.wait().map_err(|e| format!("Failed to wait for clip: {}", e))?;
+        Ok(())
+    }
+    
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+    {
+        Err("Clipboard not supported on this platform".to_string())
+    }
+}
+
+fn read_from_clipboard() -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let output = Command::new("pbpaste")
+            .output()
+            .map_err(|e| format!("Failed to run pbpaste: {}", e))?;
+        
+        String::from_utf8(output.stdout)
+            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
+    }
+    
+    #[cfg(target_os = "linux")]
+    {
+        let output = Command::new("xclip")
+            .args(&["-selection", "clipboard", "-o"])
+            .output()
+            .map_err(|e| format!("Failed to run xclip (try: sudo apt install xclip): {}", e))?;
+        
+        String::from_utf8(output.stdout)
+            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        // Windows PowerShell clipboard reading
+        let output = Command::new("powershell")
+            .args(&["-command", "Get-Clipboard"])
+            .output()
+            .map_err(|e| format!("Failed to read clipboard: {}", e))?;
+        
+        String::from_utf8(output.stdout)
+            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
+    }
+    
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+    {
+        Err("Clipboard not supported on this platform".to_string())
+    }
+}
+
 fn run_benchmark(translator: &Translator) {
     println!("\n╔═══════════════════════════════════════════════════════════════╗");
     println!("║                    Benchmark Results                          ║");
@@ -1182,11 +1370,54 @@ fn main() {
         analysis.display();
         std::process::exit(0);
     }
+    if first_arg == "visualize" {
+        if args.len() < 3 {
+            eprintln!("Usage: gslc visualize <shorthand> [-o output.svg]");
+            std::process::exit(1);
+        }
+        let svg = translator.generate_svg(&args[2], 800, 600);
+        
+        let mut output_file = None;
+        let mut i = 3;
+        while i < args.len() {
+            if args[i] == "-o" && i + 1 < args.len() {
+                output_file = Some(args[i + 1].clone());
+                break;
+            }
+            i += 1;
+        }
+        
+        if let Some(path) = output_file {
+            fs::write(&path, &svg).unwrap_or_else(|e| {
+                eprintln!("Error writing file: {}", e);
+                std::process::exit(1);
+            });
+            println!("SVG visualization written to: {}", path);
+        } else {
+            println!("{}", svg);
+        }
+        std::process::exit(0);
+    }
+    if first_arg == "clip" {
+        match read_from_clipboard() {
+            Ok(input) => {
+                let translations = translator.translate(&input);
+                let output = translator.format_output(&translations, "plain");
+                println!("{}", output);
+            }
+            Err(e) => {
+                eprintln!("Error reading from clipboard: {}", e);
+                std::process::exit(1);
+            }
+        }
+        std::process::exit(0);
+    }
 
     // Normal translation mode
     let mut input = String::new();
     let mut output_file: Option<String> = None;
     let mut format = "plain";
+    let mut copy_to_clip = false;
 
     let mut i = 1;
     while i < args.len() {
@@ -1211,6 +1442,9 @@ fn main() {
                     i += 1;
                     format = &args[i];
                 }
+            }
+            "--copy" => {
+                copy_to_clip = true;
             }
             _ => {
                 if input.is_empty() {
@@ -1246,5 +1480,12 @@ fn main() {
         println!("Translation written to: {}", output_path);
     } else {
         println!("{}", output);
+    }
+    
+    if copy_to_clip {
+        match copy_to_clipboard(&output) {
+            Ok(()) => println!("\n✓ Output copied to clipboard!"),
+            Err(e) => eprintln!("\n✗ Failed to copy to clipboard: {}", e),
+        }
     }
 }
