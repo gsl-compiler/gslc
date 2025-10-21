@@ -122,7 +122,8 @@ else
     echo "${YELLOW}⚠️  $INSTALL_DIR is not in your PATH${NC}"
     echo ""
     echo "Add this to your ~/.bashrc or ~/.zshrc:"
-    echo "   export PATH=\"\$PATH:$INSTALL_DIR\""
+    echo ""
+    echo "export PATH=\"\$PATH:$INSTALL_DIR\""
 fi
 
 echo ""
