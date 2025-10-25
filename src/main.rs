@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::io::{self, Write, BufRead};
-use std::time::Instant;
-use std::process::Command;
 
 struct Translator {
     properties: HashMap<&'static str, &'static str>,
     relationships: HashMap<&'static str, &'static str>,
-    theorems: HashMap<&'static str, (&'static str, &'static str)>,
+    theorems: HashMap<&'static str, &'static str>,
     constants: HashMap<&'static str, &'static str>,
     derived_constructions: HashMap<&'static str, &'static str>,
 }
@@ -45,45 +42,46 @@ impl Translator {
         relationships.insert("~", "similar");
 
         let mut theorems = HashMap::new();
-        theorems.insert("_TI", ("Triangle Inequality", "In any triangle, the sum of the lengths of any two sides must be greater than the length of the remaining side."));
-        theorems.insert("_ST", ("Stewart's Theorem", "Relates the length of a cevian in a triangle to the side lengths."));
-        theorems.insert("_AT", ("Apollonius Theorem", "Relates the length of a median to the side lengths."));
-        theorems.insert("_VT", ("Viviani's Theorem", "The sum of perpendiculars from any interior point to the sides of an equilateral triangle equals its altitude."));
-        theorems.insert("_NP", ("Napoleon's Theorem", "Constructing equilateral triangles on the sides of any triangle creates centers that form an equilateral triangle."));
-        theorems.insert("_EL", ("Euler Line", "The circumcenter, centroid, and orthocenter are collinear."));
-        theorems.insert("_9C", ("Nine-Point Circle", "A circle passing through nine notable points of a triangle."));
-        theorems.insert("_SL", ("Simson Line", "The feet of perpendiculars from a point on the circumcircle to the sides are collinear."));
-        theorems.insert("_CV", ("Ceva's Theorem", "Conditions for three cevians to be concurrent."));
-        theorems.insert("_ML", ("Menelaus' Theorem", "Conditions for three points on triangle sides to be collinear."));
-        theorems.insert("_AB", ("Angle Bisector Theorem", "An angle bisector divides the opposite side in the ratio of the adjacent sides."));
-        theorems.insert("_IE", ("Incenter-Excenter Lemma", "Relationships between incenter and excenters."));
-        theorems.insert("_CT", ("Carnot's Theorem", "Relates signed distances from vertices to the sides."));
-        theorems.insert("_M", ("Miquel's Theorem", "Four circles through vertices of a complete quadrilateral meet at a point."));
-        theorems.insert("_ET", ("Euler's Theorem", "In a triangle, R² = 2Rr where R is circumradius and r is inradius."));
-        theorems.insert("_DT", ("Desargue's Theorem", "Two triangles are in perspective axially if and only if they are in perspective centrally."));
-        theorems.insert("_HF", ("Heron's Formula", "Area = √(s(s-a)(s-b)(s-c)) where s is the semiperimeter."));
-        theorems.insert("_QF", ("Bretschneider's Formula", "Generalizes Brahmagupta's formula to general quadrilaterals."));
-        theorems.insert("_BF", ("Brahmagupta's Formula", "Area formula for cyclic quadrilaterals."));
-        theorems.insert("_JT", ("Japanese Theorem", "The centers of incircles of triangles formed by a cyclic polygon lie on a circle."));
-        theorems.insert("_NT", ("Newton's Theorem", "The center of a circumcircle of a tangential quadrilateral lies on the Newton line."));
-        theorems.insert("_PT", ("Ptolemy's Theorem", "In a cyclic quadrilateral: AC·BD = AB·CD + BC·AD."));
-        theorems.insert("_PP", ("Power of a Point", "For a point and circle, the product of signed distances along any line is constant."));
-        theorems.insert("_BT", ("Butterfly Theorem", "A chord perpendicular to a diameter creates equal segments."));
-        theorems.insert("_PC", ("Pascal's Theorem", "Points of intersection of opposite sides of a hexagon inscribed in a conic are collinear."));
-        theorems.insert("_LC", ("Law of Cosines", "c² = a² + b² - 2ab·cos(C)"));
-        theorems.insert("_LS", ("Law of Sines", "a/sin(A) = b/sin(B) = c/sin(C) = 2R"));
-        theorems.insert("_LT", ("Law of Tangents", "Relates tangent of half-angles to side lengths."));
-        theorems.insert("_PK", ("Pick's Theorem", "Area = I + B/2 - 1 for lattice polygons."));
-        theorems.insert("_SH", ("Shoelace Theorem", "Formula for polygon area using coordinates."));
-        theorems.insert("_SSC", ("SSS Congruence", "Three sides determine triangle congruence."));
-        theorems.insert("_SAC", ("SAS Congruence", "Two sides and included angle determine congruence."));
-        theorems.insert("_SSA", ("SSA Congruence", "Two sides and non-included angle (ambiguous case)."));
-        theorems.insert("_ASA", ("ASA Congruence", "Two angles and included side determine congruence."));
-        theorems.insert("_AAS", ("AAS Congruence", "Two angles and non-included side determine congruence."));
-        theorems.insert("_HL", ("HL Congruence", "Hypotenuse-leg congruence for right triangles."));
-        theorems.insert("_AA", ("AA Similarity", "Two angles determine triangle similarity."));
-        theorems.insert("_SAS", ("SAS Similarity", "Two sides and included angle determine similarity."));
-        theorems.insert("_SSS", ("SSS Similarity", "Three sides in proportion determine similarity."));
+        theorems.insert("_PY", "Pythagorean Theorem");
+        theorems.insert("_TI", "Triangle Inequality");
+        theorems.insert("_ST", "Stewart's Theorem");
+        theorems.insert("_AT", "Apollonius Theorem");
+        theorems.insert("_VT", "Viviani's Theorem");
+        theorems.insert("_NP", "Napoleon's Theorem");
+        theorems.insert("_EL", "Euler Line");
+        theorems.insert("_9C", "Nine-Point Circle");
+        theorems.insert("_SL", "Simson Line");
+        theorems.insert("_CV", "Ceva's Theorem");
+        theorems.insert("_ML", "Menelaus' Theorem");
+        theorems.insert("_AB", "Angle Bisector Theorem");
+        theorems.insert("_IE", "Incenter-Excenter Lemma");
+        theorems.insert("_CT", "Carnot's Theorem");
+        theorems.insert("_MQ", "Miquel's Theorem");
+        theorems.insert("_ET", "Euler's Theorem");
+        theorems.insert("_DT", "Desargue's Theorem");
+        theorems.insert("_HF", "Heron's Formula");
+        theorems.insert("_QF", "Bretschinder's Formula");
+        theorems.insert("_BF", "Brahmagupta's Formula");
+        theorems.insert("_JT", "Japanese Theorem");
+        theorems.insert("_NT", "Newton's Theorem");
+        theorems.insert("_PT", "Ptolemy's Theorem");
+        theorems.insert("_PP", "Power of a Point Theorem");
+        theorems.insert("_BT", "Butterfly Theorem");
+        theorems.insert("_PC", "Pascal's Theorem");
+        theorems.insert("_LC", "Law of Cosines");
+        theorems.insert("_LS", "Law of Sines");
+        theorems.insert("_LT", "Law of Tangents");
+        theorems.insert("_PK", "Pick's Theorem");
+        theorems.insert("_SH", "Shoelace Theorem");
+        theorems.insert("_SSC", "SSS Congruence");
+        theorems.insert("_SAC", "SAS Congruence");
+        theorems.insert("_SSA", "SSA Congruence");
+        theorems.insert("_ASA", "ASA Congruence");
+        theorems.insert("_AAS", "AAS Congruence");
+        theorems.insert("_HL", "HL Congruence");
+        theorems.insert("_AA", "AA Similarity");
+        theorems.insert("_SAS", "SAS Similarity");
+        theorems.insert("_SSS", "SSS Similarity");
 
         let mut constants = HashMap::new();
         constants.insert("\\T", "τ (tau)");
@@ -108,7 +106,10 @@ impl Translator {
         derived_constructions.insert("CT", "centroid");
         derived_constructions.insert("PD", "perpendicular");
         derived_constructions.insert("OC", "orthocenter");
+        derived_constructions.insert("9O", "nine-point center");
+        derived_constructions.insert("9C", "nine-point circle");
         derived_constructions.insert("PL", "parallel line");
+        derived_constructions.insert("TG", "tangent line");
 
         Translator {
             properties,
@@ -119,86 +120,97 @@ impl Translator {
         }
     }
 
-    fn validate(&self, input: &str) -> Result<(), Vec<String>> {
-        let mut errors = Vec::new();
-        let input = input.trim();
-
-        // Check for balanced delimiters
-        if input.starts_with("\\\\") && !input.ends_with("\\\\") {
-            errors.push("Missing closing \\\\ delimiter".to_string());
-        }
-
-        let open_brackets = input.matches('[').count();
-        let close_brackets = input.matches(']').count();
-        if open_brackets != close_brackets {
-            errors.push(format!("Mismatched brackets: {} open, {} close", open_brackets, close_brackets));
-        }
-
-        let open_parens = input.matches('(').count();
-        let close_parens = input.matches(')').count();
-        if open_parens != close_parens {
-            errors.push(format!("Mismatched parentheses: {} open, {} close", open_parens, close_parens));
-        }
-
-        let open_braces = input.matches('{').count();
-        let close_braces = input.matches('}').count();
-        if open_braces != close_braces {
-            errors.push(format!("Mismatched braces: {} open, {} close", open_braces, close_braces));
-        }
-
-        // Check for valid construction prefixes
-        let statements: Vec<&str> = input.split('/').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
-        for (i, stmt) in statements.iter().enumerate() {
-            let stmt = stmt.trim_start_matches("\\\\").trim_end_matches("\\\\");
-            if stmt.contains(':') {
-                let prefix = stmt.split(':').next().unwrap_or("");
-                let valid_prefixes = ["P", "S", "L", "W", "C", "J", "R", "G", "PB", "CCO", "CC", "AB", "ICO", "IC", "EAB", "ECO", "EC", "M", "MD", "CT", "PD", "OC", "PL"];
-                if !valid_prefixes.contains(&prefix) && !prefix.starts_with('\\') && !prefix.is_empty() {
-                    errors.push(format!("Line {}: Unknown construction prefix '{}'", i + 1, prefix));
-                }
-            }
-        }
-
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            Err(errors)
-        }
-    }
-
-    fn analyze(&self, input: &str) -> AnalysisResult {
-        let statements: Vec<&str> = input.split('/').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
+    fn pronounce(&self, input: &str, steps: bool) -> String {
+        // Remove all whitespace from input
+        let input = input.chars().filter(|c| !c.is_whitespace()).collect::<String>();
         
-        let mut points = 0;
-        let mut segments = 0;
-        let mut circles = 0;
-        let mut lines = 0;
-        let mut polygons = 0;
-        let mut theorems_used = Vec::new();
+        let mut result = String::new();
+        let chars: Vec<char> = input.chars().collect();
+        let mut i = 0;
+        let mut step_num = 1;
 
-        for stmt in &statements {
-            if stmt.contains("P:") { points += 1; }
-            if stmt.contains("S:") { segments += 1; }
-            if stmt.contains("C:") { circles += 1; }
-            if stmt.contains("L:") { lines += 1; }
-            if stmt.contains("J:") || stmt.contains("R:") { polygons += 1; }
+        while i < chars.len() {
+            let ch = chars[i];
             
-            for (abbr, _) in &self.theorems {
-                if stmt.contains(abbr) {
-                    theorems_used.push(abbr.to_string());
+            // Handle two-character sequences
+            if i + 1 < chars.len() {
+                let two_char = format!("{}{}", ch, chars[i + 1]);
+                match two_char.as_str() {
+                    "\\\\" => {
+                        if steps {
+                            // Skip opening \\, don't count as step
+                        } else {
+                            result.push_str("uh ");
+                        }
+                        i += 2;
+                        continue;
+                    }
+                    ".." => {
+                        result.push_str("duh-duh ");
+                        i += 2;
+                        continue;
+                    }
+                    _ => {}
                 }
             }
+
+            match ch {
+                '\\' => {
+                    if !steps {
+                        result.push_str("uh ");
+                    }
+                },
+                '/' => {
+                    if steps {
+                        result.push('\n');
+                        result.push_str(&format!("{}. ", step_num));
+                        step_num += 1;
+                    } else {
+                        result.push_str("mn ");
+                    }
+                },
+                ':' => result.push_str("kuh "),
+                ';' => result.push_str("suh "),
+                ',' => result.push_str("muh "),
+                '.' => result.push_str("duh "),
+                '?' => result.push_str("kwuh "),
+                '=' => result.push_str("eh "),
+                '|' => result.push_str("shuh "),
+                '*' => result.push_str("xing "),
+                'x' => result.push_str("ix "),
+                '_' => result.push_str("by "),
+                '!' => result.push_str("not "),
+                'a' => result.push_str("arc "),
+                'q' => result.push_str("sect "),
+                'l' => result.push_str("line "),
+                'c' => result.push_str("circ "),
+                'w' => result.push_str("ray "),
+                '∥' => result.push_str("pall "),
+                '⊥' => result.push_str("perp "),
+                '∠' => result.push_str("ang "),
+                '~' => result.push_str("sim "),
+                '≅' => result.push_str("cong "),
+                '[' => result.push_str("area "),
+                ']' => {},
+                '(' => result.push_str("pairim "),
+                ')' => {},
+                'A'..='Z' => {
+                    result.push(ch.to_lowercase().next().unwrap());
+                    result.push(' ');
+                }
+                _ => {
+                    result.push(ch);
+                }
+            }
+            i += 1;
         }
 
-        AnalysisResult {
-            total_statements: statements.len(),
-            points,
-            segments,
-            circles,
-            lines,
-            polygons,
-            theorems_used,
+        if steps && step_num == 1 {
+            // If steps mode but no steps created, add step number
+            result = format!("1. {}", result);
         }
+
+        result.trim().to_string()
     }
 
     fn translate_statement(&self, stmt: &str) -> String {
@@ -269,8 +281,8 @@ impl Translator {
         }
 
         // Handle derived constructions
-        if self.handle_derived_construction(stmt).is_some() {
-            return self.handle_derived_construction(stmt).unwrap();
+        if let Some(result) = self.handle_derived_construction(stmt) {
+            return result;
         }
 
         // Graph construction
@@ -377,10 +389,12 @@ impl Translator {
     }
 
     fn handle_point_construction(&self, rest: &str) -> String {
+        // Multiple points
         if rest.contains(',') && !rest.contains('.') && !rest.contains('|') && !rest.contains('x') {
             return format!("Construct points {}.", rest);
         }
 
+        // Intersection with assignment
         if rest.contains('x') && rest.contains('=') {
             if let Some(eq_pos) = rest.find('=') {
                 let point = &rest[..eq_pos];
@@ -400,6 +414,7 @@ impl Translator {
             }
         }
 
+        // Point with coordinates
         if rest.contains('{') && rest.contains('}') {
             if let Some(start) = rest.find('{') {
                 if let Some(end) = rest.find('}') {
@@ -410,6 +425,16 @@ impl Translator {
             }
         }
 
+        // Point in bounded area (P:C..ABC)
+        if rest.contains("..") {
+            if let Some(dot_pos) = rest.find("..") {
+                let point = &rest[..dot_pos];
+                let area = &rest[dot_pos + 2..];
+                return format!("Construct point {} in the region {}.", point, area);
+            }
+        }
+
+        // Point on object with conditions
         if rest.contains('.') && rest.contains('|') {
             if let Some(pipe_pos) = rest.find('|') {
                 let point_obj = &rest[..pipe_pos];
@@ -431,6 +456,7 @@ impl Translator {
             }
         }
 
+        // Point on object
         if rest.contains('.') {
             if let Some(dot_pos) = rest.find('.') {
                 let point = &rest[..dot_pos];
@@ -473,6 +499,11 @@ impl Translator {
                 } else if c.contains('*') {
                     let parts: Vec<&str> = c.split('*').collect();
                     if parts.len() == 2 {
+                        if parts[1] == "+" {
+                            return format!("{} goes clockwise", parts[0]);
+                        } else if parts[1] == "-" {
+                            return format!("{} goes counterclockwise", parts[0]);
+                        }
                         let prop_name = self
                             .properties
                             .get(parts[1])
@@ -489,14 +520,6 @@ impl Translator {
                         return format!("{} are {}", objs, rel);
                     }
                     c.to_string()
-                } else if c.starts_with("-u") {
-                    "above".to_string()
-                } else if c.starts_with("-d") {
-                    "below".to_string()
-                } else if c.starts_with("-r") {
-                    "to the right".to_string()
-                } else if c.starts_with("-l") {
-                    "to the left".to_string()
                 } else {
                     c.to_string()
                 }
@@ -699,180 +722,6 @@ impl Translator {
             .map(|s| self.translate_statement(s))
             .collect()
     }
-
-    fn format_output(&self, translations: &[String], format: &str) -> String {
-        match format {
-            "latex" => self.format_latex(translations),
-            "markdown" | "md" => self.format_markdown(translations),
-            "json" => self.format_json(translations),
-            "html" => self.format_html(translations),
-            _ => translations
-                .iter()
-                .enumerate()
-                .map(|(i, t)| format!("{}. {}", i + 1, t))
-                .collect::<Vec<_>>()
-                .join("\n"),
-        }
-    }
-
-    fn format_latex(&self, translations: &[String]) -> String {
-        let mut output = String::from("\\begin{enumerate}\n");
-        for trans in translations {
-            output.push_str(&format!("  \\item {}\n", trans));
-        }
-        output.push_str("\\end{enumerate}");
-        output
-    }
-
-    fn format_markdown(&self, translations: &[String]) -> String {
-        translations
-            .iter()
-            .enumerate()
-            .map(|(i, t)| format!("{}. {}", i + 1, t))
-            .collect::<Vec<_>>()
-            .join("\n\n")
-    }
-
-    fn format_json(&self, translations: &[String]) -> String {
-        let items: Vec<String> = translations
-            .iter()
-            .enumerate()
-            .map(|(i, t)| {
-                let escaped = t.replace('\\', "\\\\").replace('"', "\\\"");
-                format!("  {{\n    \"step\": {},\n    \"description\": \"{}\"\n  }}", i + 1, escaped)
-            })
-            .collect();
-        format!("{{\n  \"steps\": [\n{}\n  ]\n}}", items.join(",\n"))
-    }
-
-    fn format_html(&self, translations: &[String]) -> String {
-        let mut output = String::from("<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>GSL Translation</title>\n  <style>\n    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }\n    ol { line-height: 1.8; }\n    li { margin-bottom: 10px; }\n  </style>\n</head>\n<body>\n  <h1>Geometry Construction Steps</h1>\n  <ol>\n");
-        for trans in translations {
-            let escaped = trans.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
-            output.push_str(&format!("    <li>{}</li>\n", escaped));
-        }
-        output.push_str("  </ol>\n</body>\n</html>");
-        output
-    }
-
-    fn generate_svg(&self, input: &str, width: u32, height: u32) -> String {
-        let mut svg = format!(
-            "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\">\n",
-            width, height
-        );
-        svg.push_str("  <rect width=\"100%\" height=\"100%\" fill=\"#f5f5f5\"/>\n");
-        svg.push_str("  <style>\n");
-        svg.push_str("    .point { fill: #000; }\n");
-        svg.push_str("    .line { stroke: #000; stroke-width: 2; }\n");
-        svg.push_str("    .label { font-family: Arial; font-size: 14px; fill: #000; }\n");
-        svg.push_str("  </style>\n");
-
-        let statements: Vec<&str> = input.split('/').map(|s| s.trim()).filter(|s| !s.is_empty()).collect();
-        let mut points: HashMap<String, (f64, f64)> = HashMap::new();
-        let mut point_index = 0;
-
-        // Simple layout: arrange points in a circle
-        let cx = width as f64 / 2.0;
-        let cy = height as f64 / 2.0;
-        let radius = (width.min(height) as f64 / 2.0) * 0.7;
-
-        for stmt in statements {
-            let stmt = stmt.trim_start_matches("\\\\").trim_end_matches("\\\\");
-            
-            // Extract point names
-            if stmt.starts_with("P:") {
-                let rest = &stmt[2..];
-                let point_names: Vec<&str> = rest.split(',').collect();
-                for name in point_names {
-                    let name = name.trim();
-                    if !points.contains_key(name) {
-                        let angle = (point_index as f64) * 2.0 * std::f64::consts::PI / 6.0;
-                        let x = cx + radius * angle.cos();
-                        let y = cy + radius * angle.sin();
-                        points.insert(name.to_string(), (x, y));
-                        point_index += 1;
-                    }
-                }
-            }
-            
-            // Draw segments
-            if stmt.starts_with("S:") {
-                let rest = &stmt[2..];
-                if rest.len() >= 2 {
-                    let p1 = &rest[0..1];
-                    let p2 = &rest[1..2];
-                    if let (Some(&(x1, y1)), Some(&(x2, y2))) = (points.get(p1), points.get(p2)) {
-                        svg.push_str(&format!(
-                            "  <line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" class=\"line\"/>\n",
-                            x1, y1, x2, y2
-                        ));
-                    }
-                }
-            }
-            
-            // Draw polygons
-            if stmt.starts_with("J:") {
-                let rest = &stmt[2..];
-                let mut path = String::from("  <path d=\"M");
-                for (i, ch) in rest.chars().enumerate() {
-                    if let Some(&(x, y)) = points.get(&ch.to_string()) {
-                        if i == 0 {
-                            path.push_str(&format!(" {} {}", x, y));
-                        } else {
-                            path.push_str(&format!(" L {} {}", x, y));
-                        }
-                    }
-                }
-                path.push_str(" Z\" class=\"line\" fill=\"none\"/>\n");
-                svg.push_str(&path);
-            }
-        }
-
-        // Draw points last (so they appear on top)
-        for (name, &(x, y)) in &points {
-            svg.push_str(&format!("  <circle cx=\"{}\" cy=\"{}\" r=\"4\" class=\"point\"/>\n", x, y));
-            svg.push_str(&format!("  <text x=\"{}\" y=\"{}\" class=\"label\">{}</text>\n", x + 10.0, y - 10.0, name));
-        }
-
-        svg.push_str("</svg>");
-        svg
-    }
-}
-
-struct AnalysisResult {
-    total_statements: usize,
-    points: usize,
-    segments: usize,
-    circles: usize,
-    lines: usize,
-    polygons: usize,
-    theorems_used: Vec<String>,
-}
-
-impl AnalysisResult {
-    fn display(&self) {
-        println!("\n╔═══════════════════════════════════════════════════════════════╗");
-        println!("║                    Analysis Results                           ║");
-        println!("╚═══════════════════════════════════════════════════════════════╝\n");
-        println!("Total Statements: {}", self.total_statements);
-        println!("\nConstruction Breakdown:");
-        println!("  Points:    {}", self.points);
-        println!("  Segments:  {}", self.segments);
-        println!("  Lines:     {}", self.lines);
-        println!("  Circles:   {}", self.circles);
-        println!("  Polygons:  {}", self.polygons);
-        
-        if !self.theorems_used.is_empty() {
-            println!("\nTheorems Referenced:");
-            for theorem in &self.theorems_used {
-                println!("  • {}", theorem);
-            }
-        }
-        
-        let complexity = self.total_statements + self.theorems_used.len() * 2;
-        println!("\nComplexity Score: {}", complexity);
-        println!("  (Simple: <10, Moderate: 10-20, Complex: >20)\n");
-    }
 }
 
 fn show_about() {
@@ -880,17 +729,16 @@ fn show_about() {
     println!("║           GSL Compiler (gslc) - About                         ║");
     println!("╚═══════════════════════════════════════════════════════════════╝\n");
     println!("Geometry Shorthand Language (GSL) Compiler");
-    println!("Version: 3.0.1\n");
-    println!("Created by: Aarav Desai (politikl on GitHub)");
+    println!("Version: 1.1.0\n");
+    println!("Created by: politikl");
     println!("Language by: LX and YY\n");
     println!("Description:");
     println!("  GSL is a highly logical and rigorous shorthand language for");
     println!("  expressing geometric constructions and proofs. This compiler");
     println!("  translates GSL shorthand into natural English descriptions.\n");
     println!("Quote:");
-    println!("  \"Geometry Shorthand (Construction) is a highly logical and");
-    println!("   rigorous language. A mistake in conventions will not be");
-    println!("   tolerated.\" - LX\n");
+    println!("  \"Geometry Shorthand (Construction) is a code-based language.");
+    println!("   Complete rigorosity and logicosity is required.\" - LX\n");
     println!("Repository: https://github.com/politikl/gslc");
     println!("Language Docs: https://tinyurl.com/geoshorthand\n");
     println!("For help, use: gslc help");
@@ -904,26 +752,14 @@ fn show_help() {
     println!("USAGE:");
     println!("  gslc <shorthand>              Translate shorthand directly");
     println!("  gslc -f <file.gsl>            Translate from file");
-    println!("  gslc <shorthand> -o <file>    Save translation to file");
-    println!("  gslc <shorthand> --copy       Copy output to clipboard");
+    println!("  gslc <shorthand> -o <out>     Save translation to file");
+    println!("  gslc --pronounce <shorthand>  Show pronunciation (one line)");
+    println!("  gslc --pron <shorthand>       Show pronunciation (one line)");
+    println!("  gslc --pron -s <shorthand>    Show pronunciation (steps)");
+    println!("  gslc --pron -f <file.gsl>     Pronounce from file");
     println!("  gslc about                    Show about information");
     println!("  gslc help                     Show this help message");
-    println!("  gslc lang                     Open language documentation");
-    println!("  gslc theorems                 List all theorems");
-    println!("  gslc theorem <code>           Show theorem details");
-    println!("  gslc examples                 Show examples");
-    println!("  gslc examples <topic>         Show topic-specific examples");
-    println!("  gslc interactive              Start interactive mode");
-    println!("  gslc validate <shorthand>     Validate syntax");
-    println!("  gslc stats <shorthand>        Show construction statistics");
-    println!("  gslc visualize <shorthand>    Generate SVG visualization");
-    println!("  gslc clip                     Translate from clipboard");
-    println!("  gslc benchmark                Run performance benchmark\n");
-    println!("OUTPUT FORMATS:");
-    println!("  --format latex                LaTeX enumerate format");
-    println!("  --format markdown             Markdown format");
-    println!("  --format json                 JSON format");
-    println!("  --format html                 HTML document\n");
+    println!("  gslc lang                     Open language documentation\n");
     println!("BASIC SYNTAX:");
     println!("  \\\\...\\\\                      Wrap shorthand in double backslashes");
     println!("  /                             Separate statements");
@@ -934,11 +770,28 @@ fn show_help() {
     println!("  <ABC=90                       Angle ABC is 90 degrees\n");
     println!("EXAMPLES:");
     println!("  gslc \"\\\\P:A,B/S:AB\\\\\"");
-    println!("  gslc -f problem.gsl --format latex");
-    println!("  gslc validate \"\\\\P:A/S:AB\\\\\"");
-    println!("  gslc visualize \"\\\\P:A,B,C/J:ABC\\\\\" -o triangle.svg");
-    println!("  gslc \"\\\\P:A,B/S:AB\\\\\" --copy\n");
-    println!("For complete reference: gslc lang\n");
+    println!("    → 1. Construct points A, B.");
+    println!("       2. Connect segment AB.\n");
+    println!("  gslc \"\\\\J:ABC/R:3;AB=ABC\\\\\"");
+    println!("    → 1. Construct polygon ABC.");
+    println!("       2. Construct equilateral triangle ABC with side AB.\n");
+    println!("  gslc --pron \"\\\\P:A/S:AB\\\\\"");
+    println!("    → p kuh a mn s kuh a b\n");
+    println!("  gslc --pron -s \"\\\\P:A/S:AB\\\\\"");
+    println!("    → 1. p kuh a");
+    println!("      2. s kuh a b\n");
+    println!("  gslc -f problem.gsl -o solution.txt");
+    println!("    → Translates problem.gsl and saves to solution.txt\n");
+    println!("CONSTRUCTIONS:");
+    println!("  P:   Point           S:   Segment        L:   Line");
+    println!("  W:   Ray             C:   Circle         J:   Polygon");
+    println!("  R:   Regular polygon G:   Graph\n");
+    println!("QUERIES:");
+    println!("  [ABC]?               What is the area of ABC?");
+    println!("  AB?                  What is AB?");
+    println!("  AB=BC\\?              Prove that AB = BC\n");
+    println!("For complete language reference: gslc lang");
+    println!("For more examples: https://github.com/politikl/gslc\n");
 }
 
 fn open_lang_docs() {
@@ -972,337 +825,22 @@ fn open_lang_docs() {
     println!("If the browser didn't open automatically, visit:");
     println!("https://tinyurl.com/geoshorthand\n");
 }
-
-fn show_theorems(translator: &Translator) {
-    println!("\n╔═══════════════════════════════════════════════════════════════╗");
-    println!("║                    Available Theorems                         ║");
-    println!("╚═══════════════════════════════════════════════════════════════╝\n");
-    
-    println!("TRIANGLE THEOREMS:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_TI", "_ST", "_AT", "_VT", "_NP", "_EL", "_9C", "_SL", "_CV", "_ML", "_AB", "_IE", "_CT", "_M", "_ET", "_DT", "_HF"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nQUADRILATERAL THEOREMS:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_QF", "_BF", "_JT", "_NT"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nCIRCLE THEOREMS:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_PT", "_PP", "_BT", "_PC"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nTRIGONOMETRIC THEOREMS:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_LC", "_LS", "_LT"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nCONGRUENCE & SIMILARITY:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_SSC", "_SAC", "_SSA", "_ASA", "_AAS", "_HL", "_AA", "_SAS", "_SSS"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nANALYTICAL GEOMETRY:");
-    for (code, (name, _)) in &translator.theorems {
-        if ["_PK", "_SH"].contains(&code.as_ref()) {
-            println!("  {} - {}", code, name);
-        }
-    }
-    
-    println!("\nUse 'gslc theorem <code>' for detailed information.\n");
-}
-
-fn show_theorem_detail(translator: &Translator, code: &str) {
-    let code = if !code.starts_with('_') {
-        format!("_{}", code)
-    } else {
-        code.to_string()
-    };
-    
-    if let Some((name, desc)) = translator.theorems.get(code.as_str()) {
-        println!("\n╔═══════════════════════════════════════════════════════════════╗");
-        println!("║                    Theorem Details                            ║");
-        println!("╚═══════════════════════════════════════════════════════════════╝\n");
-        println!("Code: {}", code);
-        println!("Name: {}\n", name);
-        println!("Description:");
-        println!("  {}\n", desc);
-    } else {
-        eprintln!("Error: Theorem '{}' not found.", code);
-        eprintln!("Use 'gslc theorems' to see all available theorems.\n");
-    }
-}
-
-fn show_examples(topic: Option<&str>) {
-    println!("\n╔═══════════════════════════════════════════════════════════════╗");
-    println!("║                    GSL Examples                               ║");
-    println!("╚═══════════════════════════════════════════════════════════════╝\n");
-    
-    match topic {
-        Some("triangles") | Some("triangle") => {
-            println!("TRIANGLE CONSTRUCTIONS:\n");
-            println!("1. Basic Triangle:");
-            println!("   GSL:        \\\\P:A,B,C/J:ABC\\\\");
-            println!("   English:    Construct points A, B, C. Construct triangle ABC.\n");
-            
-            println!("2. Equilateral Triangle:");
-            println!("   GSL:        \\\\P:A,B/S:AB/R:3;AB=ABC\\\\");
-            println!("   English:    Construct points A, B. Connect segment AB.");
-            println!("               Construct equilateral triangle ABC with side AB.\n");
-            
-            println!("3. Right Triangle with Area:");
-            println!("   GSL:        \\\\J:ABC/ABC*RT/[ABC]=12\\\\");
-            println!("   English:    Construct triangle ABC. ABC is right. Area of ABC is 12.\n");
-        }
-        Some("circles") | Some("circle") => {
-            println!("CIRCLE CONSTRUCTIONS:\n");
-            println!("1. Circle with Center and Radius:");
-            println!("   GSL:        \\\\P:O/C:O;5\\\\");
-            println!("   English:    Construct point O. Circle with center O and radius 5.\n");
-            
-            println!("2. Circle through Three Points:");
-            println!("   GSL:        \\\\P:A,B,C/C:A;B;C\\\\");
-            println!("   English:    Construct points A, B, C. Circle through A, B, and C.\n");
-            
-            println!("3. Circumcircle of Triangle:");
-            println!("   GSL:        \\\\J:ABC/CC:ABC=P:O\\\\");
-            println!("   English:    Construct triangle ABC. Construct circumcircle of ABC.\n");
-        }
-        Some("proofs") | Some("proof") => {
-            println!("PROOF CONSTRUCTIONS:\n");
-            println!("1. Simple Proof:");
-            println!("   GSL:        \\\\\\p:AB=CD/...steps.../\\q\\\\");
-            println!("   English:    We will prove: AB equals CD. ... And that is what was to be shown.\n");
-            
-            println!("2. Proof by Contradiction:");
-            println!("   GSL:        \\\\\\pC:AB!=CD/...steps.../\\qC\\\\");
-            println!("   English:    We will prove by contradiction: AB does not equal CD.");
-            println!("               ... Achieving a contradiction.\n");
-        }
-        None => {
-            println!("AVAILABLE EXAMPLE TOPICS:");
-            println!("  • triangles  - Triangle construction examples");
-            println!("  • circles    - Circle construction examples");
-            println!("  • proofs     - Proof examples");
-            println!("  • basic      - Basic constructions\n");
-            
-            println!("BASIC EXAMPLES:\n");
-            println!("1. Two Points and a Segment:");
-            println!("   GSL:        \\\\P:A,B/S:AB\\\\");
-            println!("   English:    Construct points A, B. Connect segment AB.\n");
-            
-            println!("2. Triangle with Given Area:");
-            println!("   GSL:        \\\\J:ABC/[ABC]=20\\\\");
-            println!("   English:    Construct triangle ABC. Area of ABC is 20.\n");
-            
-            println!("3. Perpendicular Bisector:");
-            println!("   GSL:        \\\\S:AB/PB:AB=lCD\\\\");
-            println!("   English:    Connect segment AB. Construct perpendicular bisector of AB.\n");
-            
-            println!("Use 'gslc examples <topic>' for more specific examples.\n");
-        }
-        _ => {
-            println!("Topic '{}' not found.\n", topic.unwrap());
-            println!("Available topics: triangles, circles, proofs, basic\n");
-        }
-    }
-}
-
-fn interactive_mode(translator: &Translator) {
-    println!("\n╔═══════════════════════════════════════════════════════════════╗");
-    println!("║              GSL Interactive Mode                             ║");
-    println!("╚═══════════════════════════════════════════════════════════════╝\n");
-    println!("Enter GSL statements (without \\\\). Type 'exit' to quit.\n");
-    
-    let stdin = io::stdin();
-    let mut step = 1;
-    
-    loop {
-        print!("gsl> ");
-        io::stdout().flush().unwrap();
-        
-        let mut input = String::new();
-        stdin.lock().read_line(&mut input).unwrap();
-        let input = input.trim();
-        
-        if input.is_empty() {
-            continue;
-        }
-        
-        if input == "exit" || input == "quit" {
-            println!("\nExiting interactive mode.\n");
-            break;
-        }
-        
-        if input == "help" {
-            println!("\nInteractive Mode Commands:");
-            println!("  Enter any GSL statement to translate");
-            println!("  'clear' - Clear step counter");
-            println!("  'exit' or 'quit' - Exit interactive mode\n");
-            continue;
-        }
-        
-        if input == "clear" {
-            step = 1;
-            println!("Step counter reset.\n");
-            continue;
-        }
-        
-        let translations = translator.translate(input);
-        for trans in translations {
-            println!("{}. {}", step, trans);
-            step += 1;
-        }
-        println!();
-    }
-}
-
-fn copy_to_clipboard(text: &str) -> Result<(), String> {
-    #[cfg(target_os = "macos")]
-    {
-        let mut child = Command::new("pbcopy")
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to spawn pbcopy: {}", e))?;
-        
-        if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(text.as_bytes())
-                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
-        }
-        
-        child.wait().map_err(|e| format!("Failed to wait for pbcopy: {}", e))?;
-        Ok(())
-    }
-    
-    #[cfg(target_os = "linux")]
-    {
-        let mut child = Command::new("xclip")
-            .args(&["-selection", "clipboard"])
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to spawn xclip (try: sudo apt install xclip): {}", e))?;
-        
-        if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(text.as_bytes())
-                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
-        }
-        
-        child.wait().map_err(|e| format!("Failed to wait for xclip: {}", e))?;
-        Ok(())
-    }
-    
-    #[cfg(target_os = "windows")]
-    {
-        let mut child = Command::new("clip")
-            .stdin(std::process::Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to spawn clip: {}", e))?;
-        
-        if let Some(mut stdin) = child.stdin.take() {
-            stdin.write_all(text.as_bytes())
-                .map_err(|e| format!("Failed to write to clipboard: {}", e))?;
-        }
-        
-        child.wait().map_err(|e| format!("Failed to wait for clip: {}", e))?;
-        Ok(())
-    }
-    
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    {
-        Err("Clipboard not supported on this platform".to_string())
-    }
-}
-
-fn read_from_clipboard() -> Result<String, String> {
-    #[cfg(target_os = "macos")]
-    {
-        let output = Command::new("pbpaste")
-            .output()
-            .map_err(|e| format!("Failed to run pbpaste: {}", e))?;
-        
-        String::from_utf8(output.stdout)
-            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
-    }
-    
-    #[cfg(target_os = "linux")]
-    {
-        let output = Command::new("xclip")
-            .args(&["-selection", "clipboard", "-o"])
-            .output()
-            .map_err(|e| format!("Failed to run xclip (try: sudo apt install xclip): {}", e))?;
-        
-        String::from_utf8(output.stdout)
-            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
-    }
-    
-    #[cfg(target_os = "windows")]
-    {
-        // Windows PowerShell clipboard reading
-        let output = Command::new("powershell")
-            .args(&["-command", "Get-Clipboard"])
-            .output()
-            .map_err(|e| format!("Failed to read clipboard: {}", e))?;
-        
-        String::from_utf8(output.stdout)
-            .map_err(|e| format!("Invalid UTF-8 in clipboard: {}", e))
-    }
-    
-    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
-    {
-        Err("Clipboard not supported on this platform".to_string())
-    }
-}
-
-fn run_benchmark(translator: &Translator) {
-    println!("\n╔═══════════════════════════════════════════════════════════════╗");
-    println!("║                    Benchmark Results                          ║");
-    println!("╚═══════════════════════════════════════════════════════════════╝\n");
-    
-    let test_cases = vec![
-        ("Simple", "\\\\P:A,B/S:AB\\\\"),
-        ("Medium", "\\\\P:A,B,C/J:ABC/R:3;AB=ABC/[ABC]=20\\\\"),
-        ("Complex", "\\\\P:A,B/S:AB/R:3;AB=ABC/P:D.AC|R:3;AD=ADE,[ADE]=20/P:F.BC|R:3;BF=BFG,[BFG]=5/S:DF/P:H.AB|J:DFH*R/[DFH]?\\\\"),
-    ];
-    
-    for (name, input) in test_cases {
-        let iterations = 1000;
-        let start = Instant::now();
-        
-        for _ in 0..iterations {
-            translator.translate(input);
-        }
-        
-        let duration = start.elapsed();
-        let avg_time = duration.as_micros() / iterations;
-        
-        println!("{} case:", name);
-        println!("  {} iterations in {:?}", iterations, duration);
-        println!("  Average: {} μs per translation\n", avg_time);
-    }
-}
-
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() < 2 {
         eprintln!("Usage: gslc <shorthand> [-o output.txt]");
         eprintln!("       gslc -f input.gsl [-o output.txt]");
+        eprintln!("       gslc --pronounce <shorthand>");
+        eprintln!("\nExamples:");
+        eprintln!("  gslc \"\\\\P:A/P:B/S:AB\\\\\"");
+        eprintln!("  gslc \"\\\\P:A/P:B/S:AB\\\\\" -o output.txt");
+        eprintln!("  gslc -f problem.gsl -o solution.txt");
+        eprintln!("  gslc --pron \"\\\\P:A/S:AB\\\\\"");
         eprintln!("\nFor help: gslc help");
         std::process::exit(1);
     }
 
-    let translator = Translator::new();
     let first_arg = args[1].to_lowercase();
     
     // Handle special commands
@@ -1318,136 +856,66 @@ fn main() {
         open_lang_docs();
         std::process::exit(0);
     }
-    if first_arg == "theorems" {
-        show_theorems(&translator);
-        std::process::exit(0);
-    }
-    if first_arg == "theorem" {
-        if args.len() < 3 {
-            eprintln!("Usage: gslc theorem <code>");
-            eprintln!("Example: gslc theorem _PT");
-            std::process::exit(1);
-        }
-        show_theorem_detail(&translator, &args[2]);
-        std::process::exit(0);
-    }
-    if first_arg == "examples" {
-        let topic = args.get(2).map(|s| s.as_str());
-        show_examples(topic);
-        std::process::exit(0);
-    }
-    if first_arg == "interactive" || first_arg == "-i" {
-        interactive_mode(&translator);
-        std::process::exit(0);
-    }
-    if first_arg == "benchmark" {
-        run_benchmark(&translator);
-        std::process::exit(0);
-    }
-    if first_arg == "validate" {
-        if args.len() < 3 {
-            eprintln!("Usage: gslc validate <shorthand>");
-            std::process::exit(1);
-        }
-        match translator.validate(&args[2]) {
-            Ok(()) => println!("✓ Syntax is valid!"),
-            Err(errors) => {
-                eprintln!("✗ Validation errors:");
-                for error in errors {
-                    eprintln!("  • {}", error);
-                }
-                std::process::exit(1);
-            }
-        }
-        std::process::exit(0);
-    }
-    if first_arg == "stats" {
-        if args.len() < 3 {
-            eprintln!("Usage: gslc stats <shorthand>");
-            std::process::exit(1);
-        }
-        let analysis = translator.analyze(&args[2]);
-        analysis.display();
-        std::process::exit(0);
-    }
-    if first_arg == "visualize" {
-        if args.len() < 3 {
-            eprintln!("Usage: gslc visualize <shorthand> [-o output.svg]");
-            std::process::exit(1);
-        }
-        let svg = translator.generate_svg(&args[2], 800, 600);
-        
-        let mut output_file = None;
-        let mut i = 3;
-        while i < args.len() {
-            if args[i] == "-o" && i + 1 < args.len() {
-                output_file = Some(args[i + 1].clone());
-                break;
-            }
-            i += 1;
-        }
-        
-        if let Some(path) = output_file {
-            fs::write(&path, &svg).unwrap_or_else(|e| {
-                eprintln!("Error writing file: {}", e);
-                std::process::exit(1);
-            });
-            println!("SVG visualization written to: {}", path);
-        } else {
-            println!("{}", svg);
-        }
-        std::process::exit(0);
-    }
-    if first_arg == "clip" {
-        match read_from_clipboard() {
-            Ok(input) => {
-                let translations = translator.translate(&input);
-                let output = translator.format_output(&translations, "plain");
-                println!("{}", output);
-            }
-            Err(e) => {
-                eprintln!("Error reading from clipboard: {}", e);
-                std::process::exit(1);
-            }
-        }
-        std::process::exit(0);
-    }
 
-    // Normal translation mode
+    let translator = Translator::new();
     let mut input = String::new();
     let mut output_file: Option<String> = None;
-    let mut format = "plain";
-    let mut copy_to_clip = false;
+    let mut pronounce_mode = false;
+    let mut pronounce_steps = false;
 
+    // Parse arguments
     let mut i = 1;
     while i < args.len() {
         match args[i].as_str() {
+            "--pronounce" | "--pron" => {
+                pronounce_mode = true;
+                // Check for -s flag
+                if i + 1 < args.len() && args[i + 1] == "-s" {
+                    pronounce_steps = true;
+                    i += 1;
+                }
+                // Check for -f flag
+                if i + 1 < args.len() && args[i + 1] == "-f" {
+                    i += 2;
+                    if i < args.len() {
+                        let file_path = &args[i];
+                        input = fs::read_to_string(file_path).unwrap_or_else(|e| {
+                            eprintln!("Error reading file: {}", e);
+                            std::process::exit(1);
+                        });
+                    }
+                } else if i + 1 < args.len() {
+                    i += 1;
+                    input = args[i].clone();
+                }
+            }
             "-f" => {
                 if i + 1 < args.len() {
                     i += 1;
-                    input = fs::read_to_string(&args[i]).unwrap_or_else(|e| {
+                    let file_path = &args[i];
+                    input = fs::read_to_string(file_path).unwrap_or_else(|e| {
                         eprintln!("Error reading file: {}", e);
                         std::process::exit(1);
                     });
+                } else {
+                    eprintln!("Error: -f requires a filename");
+                    std::process::exit(1);
                 }
             }
             "-o" => {
                 if i + 1 < args.len() {
                     i += 1;
                     output_file = Some(args[i].clone());
+                } else {
+                    eprintln!("Error: -o requires a filename");
+                    std::process::exit(1);
                 }
             }
-            "--format" => {
-                if i + 1 < args.len() {
-                    i += 1;
-                    format = &args[i];
-                }
-            }
-            "--copy" => {
-                copy_to_clip = true;
+            "-s" => {
+                // -s flag handled in --pron context
             }
             _ => {
-                if input.is_empty() {
+                if input.is_empty() && !args[i].starts_with('-') {
                     input = args[i].clone();
                 }
             }
@@ -1457,35 +925,38 @@ fn main() {
 
     if input.is_empty() {
         eprintln!("Error: No input provided");
+        eprintln!("For help: gslc help");
         std::process::exit(1);
     }
 
-    // Validate first
-    if let Err(errors) = translator.validate(&input) {
-        eprintln!("⚠ Validation warnings:");
-        for error in errors {
-            eprintln!("  • {}", error);
-        }
-        eprintln!();
+    // Handle pronunciation mode
+    if pronounce_mode {
+        let pronunciation = translator.pronounce(&input, pronounce_steps);
+        println!("{}", pronunciation);
+        std::process::exit(0);
     }
 
+    // Translate
     let translations = translator.translate(&input);
-    let output = translator.format_output(&translations, format);
 
+    // Output
     if let Some(output_path) = output_file {
-        fs::write(&output_path, &output).unwrap_or_else(|e| {
+        let output = translations
+            .iter()
+            .enumerate()
+            .map(|(i, t)| format!("{}. {}", i + 1, t))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        fs::write(&output_path, output).unwrap_or_else(|e| {
             eprintln!("Error writing file: {}", e);
             std::process::exit(1);
         });
+
         println!("Translation written to: {}", output_path);
     } else {
-        println!("{}", output);
-    }
-    
-    if copy_to_clip {
-        match copy_to_clipboard(&output) {
-            Ok(()) => println!("\n✓ Output copied to clipboard!"),
-            Err(e) => eprintln!("\n✗ Failed to copy to clipboard: {}", e),
+        for (i, translation) in translations.iter().enumerate() {
+            println!("{}. {}", i + 1, translation);
         }
     }
 }
