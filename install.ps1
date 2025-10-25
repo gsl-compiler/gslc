@@ -78,6 +78,6 @@ else {
 
 Write-Host ""
 Write-Host "🎉 Try it out:" -ForegroundColor Cyan
-Write-Host "   gslc '\\P:A/P:B/S:AB\\'"
+Write-Host "  gslc '\\P:A/P:B/S:AB\\'"
 Write-Host ""
 Write-Host "📚 Documentation: https://tinyurl.com/geoshorthand" -ForegroundColor Cyan
