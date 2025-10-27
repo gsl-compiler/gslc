@@ -36,8 +36,9 @@ gslc '\\P:A/P:B/S:AB\\'
 
 Output:
 ```
-1. Construct points A, B.
-2. Connect segment AB.
+1. Construct point A.
+2. Construct point B.
+3. Connect segment AB.
 ```
 
 **Save to file:**
@@ -199,7 +200,6 @@ gslc -f sample.gsl
 
 ## Links
 
-* **Online Translator**: https://politikl.github.io/geometry-shorthand-translator
 * **Language Documentation**: https://tinyurl.com/gsldocumentation
 * **GitHub Repository**: https://github.com/politikl/gslc
 
@@ -215,4 +215,5 @@ MIT License - See LICENSE file for details
 ---
 
 *"Geometry Shorthand (Construction) is a code-based language. Complete rigorosity and logicosity is required." - LX*
+
 
