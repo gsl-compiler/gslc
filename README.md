@@ -200,7 +200,7 @@ gslc -f sample.gsl
 ## Links
 
 * **Online Translator**: https://politikl.github.io/geometry-shorthand-translator
-* **Language Documentation**: https://tinyurl.com/geoshorthand
+* **Language Documentation**: https://tinyurl.com/gsldocumentation
 * **GitHub Repository**: https://github.com/politikl/gslc
 
 ## Credits
@@ -215,3 +215,4 @@ MIT License - See LICENSE file for details
 ---
 
 *"Geometry Shorthand (Construction) is a code-based language. Complete rigorosity and logicosity is required." - LX*
+
