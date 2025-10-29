@@ -210,11 +210,12 @@ gslc -f sample.gsl
 
 ## License
 
-MIT License - See [LICENSE](https://github.com/politikl/gslc?tab=MIT-1-ov-file) file for details
+MIT License - See [LICENSE](https://github.com/politikl/gslc/blob/main/LICENSE) file for details
 
 ---
 
 *"Geometry Shorthand (Construction) is a code-based language. Complete rigorosity and logicosity is required." - LX*
+
 
 
 
